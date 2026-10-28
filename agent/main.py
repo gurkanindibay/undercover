@@ -19,12 +19,20 @@ from agent.tools import TOOLS, request
 load_dotenv(override=True)
 
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+DEEPSEEK_BASE_URL = "https://api.deepseek.com"
 DEFAULT_MODEL = "openai/gpt-6-luna"
 
 
 def model() -> ChatOpenAI:
     """Return the model named in MODEL_NAME, or GPT-6 Luna by default."""
     name = os.getenv("MODEL_NAME")
+    deepseek_key = os.getenv("DEEPSEEK_API_KEY") or os.getenv("DEEP_SEEK_API_KEY")
+    if name and "deepseek" in name and deepseek_key:
+        return ChatOpenAI(
+            model=name,
+            base_url=DEEPSEEK_BASE_URL,
+            api_key=SecretStr(deepseek_key),
+        )
     return ChatOpenAI(
         model=name or DEFAULT_MODEL,
         base_url=OPENROUTER_BASE_URL,
